@@ -10,12 +10,13 @@ import Foundation
 import UIKit
 import CoreData
 
-class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UINavigationBarDelegate, UINavigationControllerDelegate {
+class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UINavigationBarDelegate, UINavigationControllerDelegate, UISearchBarDelegate {
     
     var bundle = NSBundle.mainBundle()
     
     //outlets
     @IBOutlet weak var toggle: UISegmentedControl!
+    @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var ideasTable: UITableView!
     
     let searchButton = UIButton()
@@ -28,6 +29,47 @@ class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewD
     
     //conditionals
     var inProgressSide = Bool()
+    
+    
+    
+    
+    var searchActive : Bool = false
+    var filtered:[NSManagedObject] = []
+    
+    
+    func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
+        //searchActive = true;
+    }
+    
+    func searchBarTextDidEndEditing(searchBar: UISearchBar) {
+        searchActive = false;
+    }
+    
+    func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+        searchActive = false;
+    }
+    
+    func searchBarSearchButtonClicked(searchBar: UISearchBar) {
+        searchActive = false;
+    }
+    
+    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+        filtered = ideas.filter({ (text) -> Bool in
+            let tmp: NSString = text.valueForKey("name") as! NSString
+            let range = tmp.rangeOfString(searchText, options: NSStringCompareOptions.CaseInsensitiveSearch)
+            return range.location != NSNotFound
+        })
+        if(filtered.count == 0){
+            searchActive = false;
+        } else {
+            searchActive = true;
+        }
+        self.ideasTable.reloadData()
+    }
+    
+    
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -54,16 +96,8 @@ class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewD
         }
         ideas = fetchedResults
         
-        //separate ideas into completed or in progress
+        searchBar.delegate = self
         
-//        for(var i=0; i<ideas.count; i++) {
-//            if(ideas[i].valueForKey("completed") as! Bool == true) {
-//                completed.append(ideas[i])
-//            } else {
-//                inProgress.append(ideas[i])
-//            }
-//        }
-//        
         ideasTable.dataSource = self
         
         ideasTable.reloadData()
@@ -74,6 +108,8 @@ class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewD
         
         //separate ideas into completed or in progress
         
+        searchActive = false
+        
         inProgress = [NSManagedObject]()
         completed = [NSManagedObject]()
         
@@ -83,6 +119,10 @@ class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewD
             } else {
                 inProgress.append(ideas[i])
             }
+        }
+        
+        if(searchActive) {
+            print("search still active")
         }
         
         ideasTable.reloadData()
@@ -104,14 +144,37 @@ class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewD
         settingsButton.frame = CGRectMake(self.view.frame.size.width / 2 + 15, self.view.frame.size.height - 53, 45, 45)
         settingsButton.addTarget(self, action: "settings:", forControlEvents: .TouchUpInside)
         settingsButton.setImage(settings, forState: .Normal)
-        settingsButton.setImage(settings, forState: .Normal)
         settingsButton.tintColor = purple
         self.view.addSubview(settingsButton)
         
     }
     
     func search(sender: UIButton) {
-        print("search")
+        let search = UIImage(named:"search@1x.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
+        let searching = UIImage(named:"search@1x.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
+        if(searchBar.hidden) {
+            searchActive = true
+            searchBar.hidden = false
+            searchButton.setImage(searching, forState: .Normal)
+            self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: UIBarButtonItemStyle.Plain, target: self, action: "doneSearching:")
+            filtered = ideas
+            ideasTable.reloadData()
+        } else {
+            searchActive = false
+            searchBar.hidden = true
+            searchButton.setImage(search, forState: .Normal)
+            //inProgressSide = true
+            self.navigationItem.leftBarButtonItem = nil
+            ideasTable.reloadData()
+        }
+    }
+    
+    func doneSearching(sender: UIBarButtonItem) {
+        searchActive = false
+        searchBar.hidden = true
+        //inProgressSide = true
+        self.navigationItem.leftBarButtonItem = nil
+        ideasTable.reloadData()
     }
     
     func settings(sender: UIButton) {
@@ -145,7 +208,6 @@ class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewD
     }
     
     func changeSide(sender: UISegmentedControl) {
-        print(toggle.selectedSegmentIndex)
         if(toggle.selectedSegmentIndex == 0) {
             inProgressSide = true
         } else {
@@ -157,6 +219,9 @@ class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewD
     
     // MARK: UITableViewDataSource
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if(searchActive) {
+            return filtered.count
+        }
         if(inProgressSide) {
             return inProgress.count
         } else {
@@ -166,8 +231,22 @@ class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewD
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("ideaCell", forIndexPath: indexPath) as! IdeaCell
-        
-        if(inProgressSide) {
+        if(searchActive) {
+            cell.nameLabel.text = filtered[indexPath.row].valueForKey("name") as! String
+            cell.summaryLabel.text = filtered[indexPath.row].valueForKey("summary") as! String
+            cell.checkedButton.tag = indexPath.row
+            cell.checkedButton.addTarget(self, action: "complete:", forControlEvents: .TouchUpInside)
+            var image = UIImage()
+            if(filtered[indexPath.row].valueForKey("completed") as! Bool) {
+                image = (UIImage(named: "checkCircle@1x.png") as UIImage?)!
+                print("completed")
+            } else {
+                image = (UIImage(named: "purpCicle@1x.png") as UIImage?)!
+                print("in progress")
+            }
+            cell.checkedButton.setImage(image, forState: .Normal)
+            return cell
+        } else if(inProgressSide) {
             cell.nameLabel.text = inProgress[indexPath.row].valueForKey("name") as! String
             cell.summaryLabel.text = inProgress[indexPath.row].valueForKey("summary") as! String
             cell.checkedButton.tag = indexPath.row
@@ -190,7 +269,16 @@ class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewD
     
     func complete(sender: UIButton) {
         
-        if(inProgressSide) {
+        if(searchActive) {
+            let index = matchIdeas(filtered[sender.tag])
+            if(ideas[index].valueForKey("completed") as! Bool) {
+                ideas[index].setValue(true, forKey: "completed")
+                filtered[sender.tag].setValue(false, forKey: "completed")
+            } else {
+                ideas[index].setValue(false, forKey: "completed")
+                filtered[sender.tag].setValue(true, forKey: "completed")
+            }
+        } else if(inProgressSide) {
             let index = matchIdeas(inProgress[sender.tag])
             ideas[index].setValue(true, forKey: "completed")
         } else {
@@ -203,7 +291,6 @@ class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewD
         inProgress = [NSManagedObject]()
         
         for(var i=0; i<ideas.count; i++) {
-            print(ideas[i].valueForKey("id") as! Int)
             if(ideas[i].valueForKey("completed") as! Bool == true) {
                 completed.append(ideas[i])
             } else {
@@ -248,7 +335,16 @@ class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewD
         if(segue.identifier == "showIdeaDetails") {
             if let indexPath = self.ideasTable.indexPathForSelectedRow {
                 let controller = segue.destinationViewController as! SubIdeasViewController
-                if(inProgressSide) {
+                if(searchActive) {
+                    controller.idea = matchIdeas(filtered[indexPath.row])
+                    
+                    searchActive = false
+                    searchBar.hidden = true
+                    inProgressSide = true
+                    searchBar.text = ""
+                    toggle.selectedSegmentIndex = 0
+                    
+                } else if(inProgressSide) {
                     controller.idea = matchIdeas(inProgress[indexPath.row])
                 } else {
                     controller.idea = matchIdeas(completed[indexPath.row])
@@ -257,14 +353,4 @@ class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewD
             }
         }
     }
-    
-    
-    //test methods
-    
-    func printIdea(idea: NSManagedObject) {
-        print(idea.valueForKey("name") as! String)
-        print(idea.valueForKey("summary") as! String)
-    }
-    
-    
 }

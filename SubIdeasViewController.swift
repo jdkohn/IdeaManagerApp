@@ -10,14 +10,16 @@ import Foundation
 import UIKit
 import CoreData
 
-class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
     @IBOutlet weak var subIdeasTable: UITableView!
+    @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var toggle: UISegmentedControl!
     @IBOutlet weak var summaryLabel: UILabel!
     
     let checkButton = UIButton()
     let editButton = UIButton()
     let stepsButton = UIButton()
+    let searchButton = UIButton()
     
     var idea = Int()
     
@@ -44,6 +46,43 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
         
         subIdeasTable.dataSource = self
         
+        searchBar.delegate = self
+    }
+    
+    
+    
+    var searchActive : Bool = false
+    var filtered:[NSManagedObject] = []
+    
+    
+    func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
+        //searchActive = true;
+    }
+    
+    func searchBarTextDidEndEditing(searchBar: UISearchBar) {
+        searchActive = false;
+    }
+    
+    func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+        searchActive = false;
+    }
+    
+    func searchBarSearchButtonClicked(searchBar: UISearchBar) {
+        searchActive = false;
+    }
+    
+    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+        filtered = subideas.filter({ (text) -> Bool in
+            let tmp: NSString = text.valueForKey("name") as! NSString
+            let range = tmp.rangeOfString(searchText, options: NSStringCompareOptions.CaseInsensitiveSearch)
+            return range.location != NSNotFound
+        })
+        if(filtered.count == 0){
+            searchActive = false;
+        } else {
+            searchActive = true;
+        }
+        self.subIdeasTable.reloadData()
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -69,22 +108,29 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
         } else {
             check = (UIImage(named:"purpCicle@1x.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate))!
         }
+        let search = UIImage(named: "search@1x.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
         let edit = UIImage(named: "edit@1x.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
         let steps = UIImage(named: "steps@1x.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
         
-        checkButton.frame = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height - 53, 45, 45)
+        checkButton.frame = CGRectMake(self.view.frame.size.width / 2 - 111.5, self.view.frame.size.height - 53, 45, 45)
         checkButton.addTarget(self, action: "check:", forControlEvents: .TouchUpInside)
         checkButton.setImage(check, forState: .Normal)
         checkButton.tintColor = purple
         self.view.addSubview(checkButton)
         
-        editButton.frame = CGRectMake(self.view.frame.size.width / 2 - 22.5, self.view.frame.size.height - 53, 45, 45)
+        searchButton.frame = CGRectMake(self.view.frame.size.width / 2 - 52.5, self.view.frame.size.height - 53, 45, 45)
+        searchButton.addTarget(self, action: "search:", forControlEvents: .TouchUpInside)
+        searchButton.setImage(search, forState: .Normal)
+        searchButton.tintColor = purple
+        self.view.addSubview(searchButton)
+        
+        editButton.frame = CGRectMake(self.view.frame.size.width / 2 + 7.5, self.view.frame.size.height - 53, 45, 45)
         editButton.addTarget(self, action: "edit:", forControlEvents: .TouchUpInside)
         editButton.setImage(edit, forState: .Normal)
         editButton.tintColor = purple
         self.view.addSubview(editButton)
         
-        stepsButton.frame = CGRectMake(self.view.frame.size.width / 2 + 45, self.view.frame.size.height - 53, 45, 45)
+        stepsButton.frame = CGRectMake(self.view.frame.size.width / 2 + 67.5, self.view.frame.size.height - 53, 45, 45)
         stepsButton.addTarget(self, action: "steps:", forControlEvents: .TouchUpInside)
         stepsButton.setImage(steps, forState: .Normal)
         stepsButton.tintColor = purple
@@ -123,6 +169,31 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
         checkButton.setImage(check, forState: .Normal)
     }
     
+    func search(sender: UIButton) {
+        if(searchBar.hidden) {
+            searchActive = true
+            searchBar.hidden = false
+            filtered = subideas
+            searchBar.text = ""
+            self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: UIBarButtonItemStyle.Plain, target: self, action: "doneSearching:")
+            subIdeasTable.reloadData()
+        } else {
+            searchActive = false
+            searchBar.hidden = true
+            //inProgressSide = true
+            self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "home.png"), style: .Plain, target: self,action: "home:")
+            subIdeasTable.reloadData()
+        }
+    }
+    
+    func doneSearching(sender: UIBarButtonItem) {
+        searchActive = false
+        searchBar.hidden = true
+        //inProgressSide = true
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "home.png"), style: .Plain, target: self,action: "home:")
+        subIdeasTable.reloadData()
+    }
+    
     func edit(sender: UIButton) {
         performSegueWithIdentifier("editIdea", sender: nil)
     }
@@ -132,7 +203,6 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func configureActions() {
-        print(ideas[idea].valueForKey("name") as! String)
         
         self.title = ideas[idea].valueForKey("name") as! String
 
@@ -153,7 +223,6 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func changeSide(sender: UISegmentedControl) {
-        print(toggle.selectedSegmentIndex)
         if(toggle.selectedSegmentIndex == 0) {
             inProgressSide = true
         } else {
@@ -203,6 +272,9 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
     
     // MARK: UITableViewDataSource
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if(searchActive) {
+            return filtered.count
+        }
         if(inProgressSide) {
             return inProgress.count
         } else {
@@ -213,7 +285,21 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("subIdeaCell", forIndexPath: indexPath) as! SubIdeaCell
         
-        if(inProgressSide) {
+        if(searchActive) {
+            cell.nameLabel.text = filtered[indexPath.row].valueForKey("name") as! String
+            cell.button.tag = indexPath.row
+            cell.button.addTarget(self, action: "complete:", forControlEvents: .TouchUpInside)
+            var image = UIImage()
+            if(filtered[indexPath.row].valueForKey("completed") as! Bool) {
+                image = (UIImage(named: "checkCircle@1x.png") as UIImage?)!
+                print("completed")
+            } else {
+                image = (UIImage(named: "purpCicle@1x.png") as UIImage?)!
+                print("in progress")
+            }
+            cell.button.setImage(image, forState: .Normal)
+            return cell
+        } else if(inProgressSide) {
             cell.nameLabel.text = inProgress[indexPath.row].valueForKey("name") as! String
             cell.button.tag = indexPath.row
             cell.button.addTarget(self, action: "complete:", forControlEvents: .TouchUpInside)
@@ -234,7 +320,16 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func complete(sender: UIButton) {
         
-        if(inProgressSide) {
+        if(searchActive) {
+            let index = matchIdeas(filtered[sender.tag])
+            if(subideas[index].valueForKey("completed") as! Bool) {
+                subideas[index].setValue(true, forKey: "completed")
+                filtered[sender.tag].setValue(false, forKey: "completed")
+            } else {
+                subideas[index].setValue(false, forKey: "completed")
+                filtered[sender.tag].setValue(true, forKey: "completed")
+            }
+        } else if(inProgressSide) {
             let index = matchIdeas(inProgress[sender.tag])
             subideas[index].setValue(true, forKey: "completed")
         } else {
@@ -287,12 +382,13 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
             if let indexPath = self.subIdeasTable.indexPathForSelectedRow {
                 let controller = segue.destinationViewController as! SubIdeaDetailViewController
                 controller.subVC = 2
-                if(inProgressSide) {
+                if(searchActive) {
+                    //print(matchIdeas(filtered[indexPath.row]))
+                    controller.subidea = matchIdeas(filtered[indexPath.row])
+                } else if(inProgressSide) {
                     controller.subidea = matchIdeas(inProgress[indexPath.row])
-                    print(matchIdeas(inProgress[indexPath.row]))
                 } else {
                     controller.subidea = matchIdeas(completed[indexPath.row])
-                    print(matchIdeas(completed[indexPath.row]))
                 }
             }
         }
@@ -301,6 +397,11 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
             controller.idea = idea
         }
         
+        searchActive = false
+        searchBar.hidden = true
+        inProgressSide = true
+        searchBar.text = ""
+        toggle.selectedSegmentIndex = 0
     }
     
     

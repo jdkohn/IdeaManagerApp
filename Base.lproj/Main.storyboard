@@ -84,16 +84,26 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
+                            <searchBar hidden="YES" contentMode="redraw" misplaced="YES" placeholder="Ideas" translatesAutoresizingMaskIntoConstraints="NO" id="VFF-aC-bLP">
+                                <rect key="frame" x="0.0" y="66" width="600" height="44"/>
+                                <color key="backgroundColor" red="0.24313725489999999" green="0.14117647059999999" blue="0.79215686269999996" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="barTintColor" red="0.24313725489999999" green="0.14117647059999999" blue="0.79215686269999996" alpha="1" colorSpace="calibratedRGB"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </searchBar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="d2s-30-AJa" firstAttribute="top" secondItem="VFF-aC-bLP" secondAttribute="bottom" id="6ni-AS-kqp"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="d2s-30-AJa" secondAttribute="bottom" id="9t6-tv-lLT"/>
                             <constraint firstItem="Ibd-Sy-xrd" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="8" id="BLQ-cF-R0v"/>
                             <constraint firstItem="d2s-30-AJa" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-20" id="FLv-Yd-JsK"/>
                             <constraint firstItem="Ibd-Sy-xrd" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="HA6-In-pdb"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="d2s-30-AJa" secondAttribute="bottom" constant="61" id="Hi8-Dq-sui"/>
                             <constraint firstItem="d2s-30-AJa" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-20" id="IOp-g3-nM5"/>
+                            <constraint firstItem="VFF-aC-bLP" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-20" id="MKd-QG-AB5"/>
                             <constraint firstItem="d2s-30-AJa" firstAttribute="top" secondItem="Ibd-Sy-xrd" secondAttribute="bottom" constant="8" id="Qir-bQ-jMJ"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="VFF-aC-bLP" secondAttribute="trailing" constant="-20" id="a31-wK-jN1"/>
                             <constraint firstAttribute="trailingMargin" secondItem="d2s-30-AJa" secondAttribute="trailing" constant="-20" id="bNs-wc-4H7"/>
                             <constraint firstItem="d2s-30-AJa" firstAttribute="top" secondItem="Ibd-Sy-xrd" secondAttribute="bottom" constant="8" id="eh0-jj-Nj6"/>
                             <constraint firstAttribute="trailingMargin" secondItem="d2s-30-AJa" secondAttribute="trailing" constant="-20" id="ixU-Ro-crv"/>
@@ -109,6 +119,7 @@
                     <navigationItem key="navigationItem" id="jMn-Pd-UJi"/>
                     <connections>
                         <outlet property="ideasTable" destination="d2s-30-AJa" id="mnx-Kt-00o"/>
+                        <outlet property="searchBar" destination="VFF-aC-bLP" id="twO-ow-Dp3"/>
                         <outlet property="toggle" destination="Ibd-Sy-xrd" id="V4z-U8-tF7"/>
                         <segue destination="Pmb-9T-DpQ" kind="show" identifier="addNewIdea" id="zTQ-Xs-qbv"/>
                     </connections>
@@ -361,21 +372,30 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
+                            <searchBar hidden="YES" contentMode="redraw" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0q5-KV-ljf">
+                                <rect key="frame" x="0.0" y="118" width="600" height="44"/>
+                                <color key="barTintColor" red="0.24313725489999999" green="0.14117647059999999" blue="0.79215686269999996" alpha="1" colorSpace="calibratedRGB"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </searchBar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="zpo-Mw-OFo" firstAttribute="top" secondItem="cSp-gh-yux" secondAttribute="bottom" constant="8" id="0vW-77-Kmh"/>
                             <constraint firstItem="zpo-Mw-OFo" firstAttribute="top" secondItem="j0T-un-YvO" secondAttribute="bottom" constant="8" id="4hU-Pi-Qqx"/>
+                            <constraint firstItem="0q5-KV-ljf" firstAttribute="leading" secondItem="Tm7-sh-K8q" secondAttribute="leadingMargin" constant="-20" id="5Bm-g3-ViJ"/>
                             <constraint firstItem="j0T-un-YvO" firstAttribute="centerX" secondItem="Tm7-sh-K8q" secondAttribute="centerX" id="9F3-An-V7m"/>
                             <constraint firstItem="Gr0-aQ-N9e" firstAttribute="top" secondItem="zpo-Mw-OFo" secondAttribute="bottom" id="BTQ-nJ-IRl"/>
+                            <constraint firstItem="zpo-Mw-OFo" firstAttribute="top" secondItem="0q5-KV-ljf" secondAttribute="bottom" id="Bhc-5u-znn"/>
                             <constraint firstItem="j0T-un-YvO" firstAttribute="top" secondItem="cSp-gh-yux" secondAttribute="bottom" constant="8" id="Mlh-AM-TKy"/>
                             <constraint firstItem="cSp-gh-yux" firstAttribute="trailing" secondItem="Tm7-sh-K8q" secondAttribute="trailingMargin" id="NBn-YF-gnC"/>
                             <constraint firstItem="cSp-gh-yux" firstAttribute="top" secondItem="lUl-B0-54o" secondAttribute="bottom" constant="8" id="Z9C-AD-qjo"/>
+                            <constraint firstItem="0q5-KV-ljf" firstAttribute="top" secondItem="cSp-gh-yux" secondAttribute="bottom" id="bqX-Fu-XBV"/>
                             <constraint firstItem="zpo-Mw-OFo" firstAttribute="top" secondItem="j0T-un-YvO" secondAttribute="bottom" constant="8" id="ddU-AH-beN"/>
                             <constraint firstItem="cSp-gh-yux" firstAttribute="leading" secondItem="Tm7-sh-K8q" secondAttribute="leadingMargin" id="hqb-4f-tbr"/>
                             <constraint firstItem="Gr0-aQ-N9e" firstAttribute="top" secondItem="zpo-Mw-OFo" secondAttribute="bottom" constant="63" id="iYV-iI-z8R"/>
                             <constraint firstAttribute="trailingMargin" secondItem="zpo-Mw-OFo" secondAttribute="trailing" constant="-20" id="ijD-My-18L"/>
                             <constraint firstItem="zpo-Mw-OFo" firstAttribute="leading" secondItem="Tm7-sh-K8q" secondAttribute="leadingMargin" constant="-20" id="oK8-bR-br5"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="0q5-KV-ljf" secondAttribute="trailing" constant="-20" id="qhj-X5-oSU"/>
                             <constraint firstItem="zpo-Mw-OFo" firstAttribute="leading" secondItem="Tm7-sh-K8q" secondAttribute="leadingMargin" constant="-20" id="vCT-8t-Lmg"/>
                             <constraint firstAttribute="trailingMargin" secondItem="zpo-Mw-OFo" secondAttribute="trailing" constant="-20" id="vu3-vW-Rsr"/>
                         </constraints>
@@ -387,6 +407,7 @@
                         </variation>
                     </view>
                     <connections>
+                        <outlet property="searchBar" destination="0q5-KV-ljf" id="ois-mw-BZX"/>
                         <outlet property="subIdeasTable" destination="zpo-Mw-OFo" id="RVG-Vt-gnc"/>
                         <outlet property="summaryLabel" destination="cSp-gh-yux" id="C96-mK-rpY"/>
                         <outlet property="toggle" destination="j0T-un-YvO" id="7Ms-Uv-rcp"/>
@@ -498,8 +519,8 @@
         <image name="purpCicle@1x" width="45" height="45"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="iKW-5L-b38"/>
-        <segue reference="eZV-AG-0GH"/>
+        <segue reference="fzc-Ee-pfw"/>
         <segue reference="bax-5R-jxr"/>
+        <segue reference="iKW-5L-b38"/>
     </inferredMetricsTieBreakers>
 </document>
