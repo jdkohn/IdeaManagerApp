@@ -4,6 +4,7 @@
         <attribute name="completed" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="order" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="summary" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <entity name="Note" syncable="YES">
@@ -17,14 +18,15 @@
     </entity>
     <entity name="SubIdea" syncable="YES">
         <attribute name="completed" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="idea" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="summary" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Idea" positionX="-63" positionY="-18" width="128" height="105"/>
+        <element name="Idea" positionX="-63" positionY="-18" width="128" height="120"/>
         <element name="Note" positionX="-36" positionY="9" width="128" height="75"/>
         <element name="Photo" positionX="0" positionY="45" width="128" height="90"/>
-        <element name="SubIdea" positionX="-54" positionY="0" width="128" height="105"/>
+        <element name="SubIdea" positionX="-54" positionY="0" width="128" height="120"/>
     </elements>
 </model>

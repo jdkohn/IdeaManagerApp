@@ -172,7 +172,7 @@ class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewD
     func doneSearching(sender: UIBarButtonItem) {
         searchActive = false
         searchBar.hidden = true
-        //inProgressSide = true
+        self.view.endEditing(true)
         self.navigationItem.leftBarButtonItem = nil
         ideasTable.reloadData()
     }

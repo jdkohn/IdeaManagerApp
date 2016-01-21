@@ -83,6 +83,7 @@ class AddIdeaViewController: FormViewController {
         ideaObject.setValue(self.form.formValues().valueForKey("summary") as! String, forKey: "summary")
         ideaObject.setValue(false, forKey: "completed")
         ideaObject.setValue(self.ideas.count, forKey: "id")
+        ideaObject.setValue("", forKey: "order")
         
         var error: NSError?
         do {

@@ -189,7 +189,7 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
     func doneSearching(sender: UIBarButtonItem) {
         searchActive = false
         searchBar.hidden = true
-        //inProgressSide = true
+        self.view.endEditing(true)
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "home.png"), style: .Plain, target: self,action: "home:")
         subIdeasTable.reloadData()
     }
@@ -199,7 +199,7 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func steps(sender: UIButton) {
-        print("steps")
+        performSegueWithIdentifier("viewSteps", sender: nil)
     }
     
     func configureActions() {
@@ -219,7 +219,12 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
     func home(sender: UIBarButtonItem) {
         //performSegueWithIdentifier("ideaToHome", sender: nil)
         let viewControllers: [UIViewController] = self.navigationController!.viewControllers as [UIViewController];
-        self.navigationController!.popToViewController(viewControllers[viewControllers.count - ideaVC], animated: true);
+        
+        if(ideaVC == 0) {
+            self.navigationController!.popToViewController(viewControllers[viewControllers.count - 2], animated: true);
+        } else {
+            self.navigationController!.popToViewController(viewControllers[viewControllers.count - ideaVC], animated: true);
+        }
     }
     
     func changeSide(sender: UISegmentedControl) {
@@ -395,6 +400,14 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
         if(segue.identifier == "editIdea") {
             let controller = segue.destinationViewController as! EditIdeaVC
             controller.idea = idea
+        }
+        if(segue.identifier == "viewSteps") {
+            let controller = segue.destinationViewController as! StepViewController
+            controller.idea = idea
+            if(ideaVC == 4) {
+                controller.justEdited = true
+            }
+            
         }
         
         searchActive = false

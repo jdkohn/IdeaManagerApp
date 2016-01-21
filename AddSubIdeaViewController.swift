@@ -13,6 +13,7 @@ import CoreData
 
 class AddSubIdeaViewController: FormViewController {
     
+    var ideas = [NSManagedObject]()
     var subideas = [NSManagedObject]()
     var idea = Int()
     
@@ -30,6 +31,20 @@ class AddSubIdeaViewController: FormViewController {
             print("Fetch failed: \(error.localizedDescription)")
         }
         subideas = fetchedResults
+        
+        
+        let fetchR = NSFetchRequest(entityName:"Idea")
+        let e: NSError?
+        var fetchedR = [NSManagedObject]()
+        do {
+            fetchedR = try managedContext.executeFetchRequest(fetchR) as! [NSManagedObject]
+        } catch let e as NSError {
+            print("Fetch failed: \(e.localizedDescription)")
+        }
+        ideas = fetchedR
+        
+        
+        
         
         let form = FormDescriptor()
         
@@ -83,6 +98,12 @@ class AddSubIdeaViewController: FormViewController {
         ideaObject.setValue(self.form.formValues().valueForKey("summary") as! String, forKey: "summary")
         ideaObject.setValue(false, forKey: "completed")
         ideaObject.setValue(idea, forKey: "idea")
+        ideaObject.setValue(self.subideas.count, forKey: "id")
+        if(ideas[idea].valueForKey("order") as! String == "") {
+            ideas[idea].setValue(String(subideas.count), forKey: "order")
+        } else {
+            ideas[idea].setValue(ideas[idea].valueForKey("order") as! String + "-" + String(subideas.count), forKey: "order")
+        }
         
         var error: NSError?
         do {
@@ -110,6 +131,7 @@ class AddSubIdeaViewController: FormViewController {
         if(segue.identifier == "newToSubIdeas") {
             let controller = segue.destinationViewController as! SubIdeasViewController
             controller.idea = idea
+            controller.ideaVC = 4
         }
     }
     
