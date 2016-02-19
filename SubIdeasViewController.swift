@@ -29,6 +29,7 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
     var subideas = [NSManagedObject]()
     var inProgress = [NSManagedObject]()
     var completed = [NSManagedObject]()
+    var all = [NSManagedObject]()
     
     var inProgressSide = Bool()
     
@@ -72,7 +73,7 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
-        filtered = subideas.filter({ (text) -> Bool in
+        filtered = all.filter({ (text) -> Bool in
             let tmp: NSString = text.valueForKey("name") as! NSString
             let range = tmp.rangeOfString(searchText, options: NSStringCompareOptions.CaseInsensitiveSearch)
             return range.location != NSNotFound
@@ -173,7 +174,7 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
         if(searchBar.hidden) {
             searchActive = true
             searchBar.hidden = false
-            filtered = subideas
+            filtered = all
             searchBar.text = ""
             self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: UIBarButtonItemStyle.Plain, target: self, action: "doneSearching:")
             subIdeasTable.reloadData()
@@ -240,6 +241,7 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
         completed = [NSManagedObject]()
         inProgress = [NSManagedObject]()
         var temp = [NSManagedObject]()
+        var temp2 = [NSManagedObject]()
         
         for(var i=0; i<subideas.count; i++) {
             if(subideas[i].valueForKey("idea") as! Int == idea) {
@@ -248,10 +250,13 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
                 } else {
                     inProgress.append(subideas[i])
                 }
-                temp.append(subideas[i])
+                temp2.append(subideas[i])
+                print("!")
             }
+            temp.append(subideas[i])
         }
         subideas = temp
+        all = temp2
         
         subIdeasTable.reloadData()
     }
@@ -290,6 +295,8 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("subIdeaCell", forIndexPath: indexPath) as! SubIdeaCell
         
+        
+        
         if(searchActive) {
             cell.nameLabel.text = filtered[indexPath.row].valueForKey("name") as! String
             cell.button.tag = indexPath.row
@@ -297,10 +304,8 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
             var image = UIImage()
             if(filtered[indexPath.row].valueForKey("completed") as! Bool) {
                 image = (UIImage(named: "checkCircle@1x.png") as UIImage?)!
-                print("completed")
             } else {
                 image = (UIImage(named: "purpCicle@1x.png") as UIImage?)!
-                print("in progress")
             }
             cell.button.setImage(image, forState: .Normal)
             return cell
@@ -310,7 +315,6 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
             cell.button.addTarget(self, action: "complete:", forControlEvents: .TouchUpInside)
             let image = UIImage(named: "purpCicle@1x.png") as UIImage?
             cell.button.setImage(image, forState: .Normal)
-            
         } else {
             cell.nameLabel.text = completed[indexPath.row].valueForKey("name") as! String
             cell.button.tag = indexPath.row
@@ -388,7 +392,6 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
                 let controller = segue.destinationViewController as! SubIdeaDetailViewController
                 controller.subVC = 2
                 if(searchActive) {
-                    //print(matchIdeas(filtered[indexPath.row]))
                     controller.subidea = matchIdeas(filtered[indexPath.row])
                 } else if(inProgressSide) {
                     controller.subidea = matchIdeas(inProgress[indexPath.row])
