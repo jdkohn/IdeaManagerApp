@@ -92,11 +92,13 @@ class EditIdeaVC: FormViewController {
         } catch _ {
         }
         
-        performSegueWithIdentifier("doneEditingIdea", sender: nil)
+        let viewControllers: [UIViewController] = self.navigationController!.viewControllers as [UIViewController];
+        self.navigationController!.popToViewController(viewControllers[viewControllers.count - 2], animated: true);
     }
     
     func cancel(sender: UIBarButtonItem) {
-        performSegueWithIdentifier("doneEditingIdea", sender: nil)
+        let viewControllers: [UIViewController] = self.navigationController!.viewControllers as [UIViewController];
+        self.navigationController!.popToViewController(viewControllers[viewControllers.count - 2], animated: true);
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {

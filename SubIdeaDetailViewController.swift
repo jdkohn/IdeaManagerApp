@@ -113,7 +113,7 @@ class SubIdeaDetailViewController: UIViewController {
     
     func back(sender: UIBarButtonItem) {
         let viewControllers: [UIViewController] = self.navigationController!.viewControllers as [UIViewController];
-        self.navigationController!.popToViewController(viewControllers[viewControllers.count - subVC], animated: true);
+        self.navigationController!.popToViewController(viewControllers[viewControllers.count - 2], animated: true);
     }
     
     func edit(sender: UIButton) {
@@ -151,8 +151,8 @@ class SubIdeaDetailViewController: UIViewController {
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if(segue.identifier == "returnToSubIdeas") {
                 let controller = segue.destinationViewController as! SubIdeasViewController
-                    controller.idea = idea
-            controller.ideaVC = 2
+                        controller.idea = idea
+                controller.ideaVC = 2
         }
         if(segue.identifier == "editSubIdea") {
             let controller = segue.destinationViewController as! EditSubIdeaViewController

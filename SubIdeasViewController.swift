@@ -89,7 +89,10 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
+        subideas = populateCoreDataArray("SubIdea")
         sortSubIdeas()
+        
+        subIdeasTable.reloadData()
     }
     
     func newSubIdea(sender: UIBarButtonItem) {

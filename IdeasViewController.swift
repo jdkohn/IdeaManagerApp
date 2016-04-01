@@ -26,12 +26,10 @@ class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewD
     var ideas = [NSManagedObject]()
     var completed = [NSManagedObject]()
     var inProgress = [NSManagedObject]()
+    var subideas = [NSManagedObject]()
     
     //conditionals
     var inProgressSide = Bool()
-    
-    
-    
     
     var searchActive : Bool = false
     var filtered:[NSManagedObject] = []
@@ -68,6 +66,27 @@ class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewD
     }
     
     
+//    func deleteIdea(deleteIdea: Int) {
+//        for(var i=0; i<ideas.count; i++) {
+//            if((ideas[i].valueForKey("id") as! Int) > deleteIdea) {
+//                ideas[i].setValue((ideas[i].valueForKey("id") as! Int) - 1, forKey: "id")
+//            }
+//        }
+//        for(var l=0; l<subideas.count; l++) {
+//            if(subideas[l].valueForKey("idea") as! Int == deleteIdea) {
+//                subideas.removeAtIndex(l)
+//                
+//                //SAVE
+//                
+//                
+//            } else if((subideas[l].valueForKey("idea") as! Int) > deleteIdea) {
+//                subideas[l].setValue((subideas[l].valueForKey("idea") as! Int) - 1, forKey: "idea")
+//                
+//                //SAVE
+//                
+//            }
+//        }
+//    }
     
     
     
@@ -110,6 +129,8 @@ class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewD
         
         searchActive = false
         
+        ideas = populateCoreDataArray("Idea")
+        
         inProgress = [NSManagedObject]()
         completed = [NSManagedObject]()
         
@@ -126,6 +147,23 @@ class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewD
         }
         
         ideasTable.reloadData()
+    }
+    
+    func populateCoreDataArray(entity: String) -> [NSManagedObject] {
+        //get ideas
+        let appDelegate =
+        UIApplication.sharedApplication().delegate as! AppDelegate
+        let managedContext = appDelegate.managedObjectContext
+        let fetchRequest = NSFetchRequest(entityName:entity)
+        let error: NSError?
+        var fetchedResults = [NSManagedObject]()
+        do {
+            fetchedResults = try managedContext.executeFetchRequest(fetchRequest) as! [NSManagedObject]
+        } catch let error as NSError {
+            
+            print("Fetch failed: \(error.localizedDescription)")
+        }
+        return fetchedResults
     }
     
     func addButtons() {
