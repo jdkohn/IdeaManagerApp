@@ -142,10 +142,6 @@ class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewD
             }
         }
         
-        if(searchActive) {
-            print("search still active")
-        }
-        
         ideasTable.reloadData()
     }
     
@@ -277,10 +273,8 @@ class IdeasViewController: UIViewController, UITableViewDataSource, UITableViewD
             var image = UIImage()
             if(filtered[indexPath.row].valueForKey("completed") as! Bool) {
                 image = (UIImage(named: "checkCircle@1x.png") as UIImage?)!
-                print("completed")
             } else {
                 image = (UIImage(named: "purpCicle@1x.png") as UIImage?)!
-                print("in progress")
             }
             cell.checkedButton.setImage(image, forState: .Normal)
             return cell

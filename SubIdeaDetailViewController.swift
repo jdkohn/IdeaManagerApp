@@ -26,14 +26,13 @@ class SubIdeaDetailViewController: UIViewController {
     let checkButton = UIButton()
     let editButton = UIButton()
     let cameraButton = UIButton()
+    let deleteButton = UIButton()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         ideas = populateCoreDataArray("Idea")
         subideas = populateCoreDataArray("SubIdea")
-        
-        print(subidea)
         
         idea = subideas[subidea].valueForKey("idea") as! Int
         
@@ -53,7 +52,8 @@ class SubIdeaDetailViewController: UIViewController {
             }
             let edit = UIImage(named: "edit@1x.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
             let camera = UIImage(named: "camera@1x.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
-            
+            let trashCan = UIImage(named: "TrashCan@1x.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
+        
             checkButton.frame = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height - 53, 45, 45)
             checkButton.addTarget(self, action: "check:", forControlEvents: .TouchUpInside)
             checkButton.setImage(check, forState: .Normal)
@@ -66,11 +66,17 @@ class SubIdeaDetailViewController: UIViewController {
             editButton.tintColor = purple
             self.view.addSubview(editButton)
             
-            cameraButton.frame = CGRectMake(self.view.frame.size.width / 2 + 45, self.view.frame.size.height - 53, 45, 45)
-            cameraButton.addTarget(self, action: "camera:", forControlEvents: .TouchUpInside)
-            cameraButton.setImage(camera, forState: .Normal)
-            cameraButton.tintColor = purple
-            self.view.addSubview(cameraButton)
+//            cameraButton.frame = CGRectMake(self.view.frame.size.width / 2 + 45, self.view.frame.size.height - 53, 45, 45)
+//            cameraButton.addTarget(self, action: "camera:", forControlEvents: .TouchUpInside)
+//            cameraButton.setImage(camera, forState: .Normal)
+//            cameraButton.tintColor = purple
+//            self.view.addSubview(cameraButton)
+      
+            deleteButton.frame = CGRectMake(self.view.frame.size.width / 2 + 45, self.view.frame.size.height - 53, 45, 45)
+            deleteButton.addTarget(self, action: "deleteSub:", forControlEvents: .TouchUpInside)
+            deleteButton.setImage(trashCan, forState: .Normal)
+            deleteButton.tintColor = purple
+            self.view.addSubview(deleteButton)
         
         self.navigationItem.hidesBackButton = true
         self.navigationItem.setHidesBackButton(true, animated: false)
@@ -109,6 +115,58 @@ class SubIdeaDetailViewController: UIViewController {
         
         
         checkButton.setImage(check, forState: .Normal)
+    }
+    
+    func deleteSub(sender: AnyObject?) {
+        
+        let alert = UIAlertController(title: "Delete?", message: "Are you sure you want to delete?", preferredStyle:UIAlertControllerStyle.ActionSheet)
+        alert.addAction(UIAlertAction(title: "Delete", style: .Default, handler: { (action) -> Void in
+            let appDel:AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+            let context:NSManagedObjectContext = appDel.managedObjectContext
+            
+            for(var i=0; i<self.subideas.count; i++) {
+                if((self.subideas[i].valueForKey("id") as! Int) == self.subidea) {
+                    
+                    
+                    context.deleteObject(self.subideas[i])
+                    self.subideas.removeAtIndex(i)
+                    
+                    i--
+                    do {
+                        try context.save()
+                    } catch _ {
+                    }
+                } else {
+                    if((self.subideas[i].valueForKey("id") as! Int) > self.subidea) {
+                        self.subideas[i].setValue((self.subideas[i].valueForKey("id") as! Int) - 1, forKey: "id")
+                    }
+                }
+            }
+            
+            var error: NSError?
+            do {
+                try context.save()
+            } catch var error1 as NSError {
+                error = error1
+                print("Could not save \(error), \(error?.userInfo)")
+            }
+            
+            do {
+                try context.save()
+            } catch _ {
+            }
+            
+            self.dismissViewControllerAnimated(true, completion: nil)
+            
+            let viewControllers: [UIViewController] = self.navigationController!.viewControllers as [UIViewController];
+            self.navigationController!.popToViewController(viewControllers[viewControllers.count - 2], animated: true);
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: { (action) -> Void in
+            self.dismissViewControllerAnimated(true, completion: nil)
+        }))
+        
+        self.presentViewController(alert, animated: true, completion: nil)
+
     }
     
     func back(sender: UIBarButtonItem) {

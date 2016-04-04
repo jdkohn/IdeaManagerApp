@@ -254,7 +254,6 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
                     inProgress.append(subideas[i])
                 }
                 temp2.append(subideas[i])
-                print("!")
             }
             temp.append(subideas[i])
         }
