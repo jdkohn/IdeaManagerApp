@@ -20,6 +20,7 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
     let editButton = UIButton()
     let stepsButton = UIButton()
     let searchButton = UIButton()
+    let deleteButton = UIButton()
     
     var idea = Int()
     
@@ -48,6 +49,63 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
         subIdeasTable.dataSource = self
         
         searchBar.delegate = self
+    }
+    
+    func deleteIdea(sender: UIButton) {
+        
+        let alert = UIAlertController(title: "Delete?", message: "Are you sure you want to delete?", preferredStyle:UIAlertControllerStyle.ActionSheet)
+        alert.addAction(UIAlertAction(title: "Delete", style: .Default, handler: { (action) -> Void in
+            let appDel:AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+            let context:NSManagedObjectContext = appDel.managedObjectContext
+            
+            for(var i=0; i<self.ideas.count; i++) {
+                if((self.ideas[i].valueForKey("id") as! Int) == self.idea) {
+                    context.deleteObject(self.ideas[i])
+                    self.ideas.removeAtIndex(i)
+                    i--
+                } else if((self.ideas[i].valueForKey("id") as! Int) > self.idea) {
+                    self.ideas[i].setValue((self.ideas[i].valueForKey("id") as! Int) - 1, forKey: "id")
+                }
+            }
+            
+            for(var l=0; l<self.subideas.count; l++) {
+                if((self.subideas[l].valueForKey("idea") as! Int) == self.idea) {
+                    
+                    
+                    context.deleteObject(self.subideas[l])
+                    self.subideas.removeAtIndex(l)
+                    
+                    l--
+                } else {
+                    if((self.subideas[l].valueForKey("idea") as! Int) > self.idea) {
+                        self.subideas[l].setValue((self.subideas[l].valueForKey("idea") as! Int) - 1, forKey: "idea")
+                    }
+                }
+            }
+            
+            var error: NSError?
+            do {
+                try context.save()
+            } catch var error1 as NSError {
+                error = error1
+                print("Could not save \(error), \(error?.userInfo)")
+            }
+            
+            do {
+                try context.save()
+            } catch _ {
+            }
+            
+            self.dismissViewControllerAnimated(true, completion: nil)
+            
+            let viewControllers: [UIViewController] = self.navigationController!.viewControllers as [UIViewController];
+            self.navigationController!.popToViewController(viewControllers[viewControllers.count - 2], animated: true);
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: { (action) -> Void in
+            self.dismissViewControllerAnimated(true, completion: nil)
+        }))
+        
+        self.presentViewController(alert, animated: true, completion: nil)
     }
     
     
@@ -115,30 +173,37 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
         let search = UIImage(named: "search@1x.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
         let edit = UIImage(named: "edit@1x.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
         let steps = UIImage(named: "steps@1x.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
+        let trash = UIImage(named: "trashCan@1x.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
         
-        checkButton.frame = CGRectMake(self.view.frame.size.width / 2 - 111.5, self.view.frame.size.height - 53, 45, 45)
+        checkButton.frame = CGRectMake(self.view.frame.size.width / 2 - 122.5, self.view.frame.size.height - 53, 45, 45)
         checkButton.addTarget(self, action: "check:", forControlEvents: .TouchUpInside)
         checkButton.setImage(check, forState: .Normal)
         checkButton.tintColor = purple
         self.view.addSubview(checkButton)
         
-        searchButton.frame = CGRectMake(self.view.frame.size.width / 2 - 52.5, self.view.frame.size.height - 53, 45, 45)
+        searchButton.frame = CGRectMake(self.view.frame.size.width / 2 - 22.5, self.view.frame.size.height - 53, 45, 45)
         searchButton.addTarget(self, action: "search:", forControlEvents: .TouchUpInside)
         searchButton.setImage(search, forState: .Normal)
         searchButton.tintColor = purple
         self.view.addSubview(searchButton)
         
-        editButton.frame = CGRectMake(self.view.frame.size.width / 2 + 7.5, self.view.frame.size.height - 53, 45, 45)
+        editButton.frame = CGRectMake(self.view.frame.size.width / 2 - 72.5, self.view.frame.size.height - 53, 45, 45)
         editButton.addTarget(self, action: "edit:", forControlEvents: .TouchUpInside)
         editButton.setImage(edit, forState: .Normal)
         editButton.tintColor = purple
         self.view.addSubview(editButton)
         
-        stepsButton.frame = CGRectMake(self.view.frame.size.width / 2 + 67.5, self.view.frame.size.height - 53, 45, 45)
+        stepsButton.frame = CGRectMake(self.view.frame.size.width / 2 + 32.5, self.view.frame.size.height - 53, 45, 45)
         stepsButton.addTarget(self, action: "steps:", forControlEvents: .TouchUpInside)
         stepsButton.setImage(steps, forState: .Normal)
         stepsButton.tintColor = purple
         self.view.addSubview(stepsButton)
+        
+        deleteButton.frame = CGRectMake(self.view.frame.size.width / 2 + 82.5, self.view.frame.size.height - 53, 45, 45)
+        deleteButton.addTarget(self, action: "deleteIdea:", forControlEvents: .TouchUpInside)
+        deleteButton.setImage(trash, forState: .Normal)
+        deleteButton.tintColor = purple
+        self.view.addSubview(deleteButton)
     }
     
     func check(sender: UIButton) {

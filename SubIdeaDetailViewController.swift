@@ -132,10 +132,6 @@ class SubIdeaDetailViewController: UIViewController {
                     self.subideas.removeAtIndex(i)
                     
                     i--
-                    do {
-                        try context.save()
-                    } catch _ {
-                    }
                 } else {
                     if((self.subideas[i].valueForKey("id") as! Int) > self.subidea) {
                         self.subideas[i].setValue((self.subideas[i].valueForKey("id") as! Int) - 1, forKey: "id")
