@@ -173,7 +173,7 @@ class SubIdeasViewController: UIViewController, UITableViewDataSource, UITableVi
         let search = UIImage(named: "search@1x.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
         let edit = UIImage(named: "edit@1x.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
         let steps = UIImage(named: "steps@1x.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
-        let trash = UIImage(named: "trashCan@1x.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
+        let trash = UIImage(named: "TrashCan@1x.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
         
         checkButton.frame = CGRectMake(self.view.frame.size.width / 2 - 122.5, self.view.frame.size.height - 53, 45, 45)
         checkButton.addTarget(self, action: "check:", forControlEvents: .TouchUpInside)

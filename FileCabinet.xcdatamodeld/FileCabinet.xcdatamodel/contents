@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9525" systemVersion="15B42" minimumToolsVersion="Automatic">
+    <entity name="Category" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
     <entity name="Idea" syncable="YES">
+        <attribute name="category" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="completed" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
@@ -24,9 +28,10 @@
         <attribute name="summary" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Idea" positionX="-63" positionY="-18" width="128" height="120"/>
+        <element name="Idea" positionX="-63" positionY="-18" width="128" height="135"/>
         <element name="Note" positionX="-36" positionY="9" width="128" height="75"/>
         <element name="Photo" positionX="0" positionY="45" width="128" height="90"/>
         <element name="SubIdea" positionX="-54" positionY="0" width="128" height="120"/>
+        <element name="Category" positionX="-27" positionY="36" width="128" height="60"/>
     </elements>
 </model>

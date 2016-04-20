@@ -17,6 +17,7 @@ class StepViewController: UIViewController, UITableViewDelegate, UITableViewData
     @IBOutlet weak var toggle: UISegmentedControl!
     
     var order = [Int]()
+    var toDoOrder = [Int]()
     var subideas = [NSManagedObject]()
     var ideas = [NSManagedObject]()
     var subidea = Int()
@@ -44,7 +45,7 @@ class StepViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         configureActions()
     }
-    
+
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -101,52 +102,121 @@ class StepViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("stepCell", forIndexPath: indexPath) as! StepCell
         
         let purple = UIColor(red: 0.23137, green: 0.0, blue: 0.79215, alpha: 1.0)
         
         let upImage = UIImage(named: "upArrow.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
         let downImage = UIImage(named: "downArrow.png")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
+
+        let openCircle = UIImage(named: "purpCicle@1x.png") as UIImage?
+        let checkCircle = (UIImage(named: "checkCircle@1x.png") as UIImage?)!
         
-        if(indexPath.row != 0) {
+        if(indexPath.row == 0) {
+            let cell = tableView.dequeueReusableCellWithIdentifier("topCell", forIndexPath: indexPath) as! TopCell
+            
+            //down arrow
+            cell.down.tag = indexPath.row
+            cell.down.addTarget(self, action: "down:", forControlEvents: .TouchUpInside)
+            cell.down.setImage(downImage, forState: .Normal)
+            cell.down.tintColor = purple
+            
+            if(toDoSide) {
+                cell.nameLabel.text = toDo[indexPath.row].valueForKey("name") as! String
+                cell.checkButton.tag = indexPath.row
+                cell.checkButton.addTarget(self, action: "complete:", forControlEvents: .TouchUpInside)
+                cell.checkButton.setImage(openCircle, forState: .Normal)
+            } else {
+                cell.nameLabel.text = all[indexPath.row].valueForKey("name") as! String
+                cell.checkButton.tag = indexPath.row
+                cell.checkButton.addTarget(self, action: "complete:", forControlEvents: .TouchUpInside)
+                cell.checkButton.setImage(openCircle, forState: .Normal)
+                if(all[indexPath.row].valueForKey("completed") as! Bool) {
+                    cell.checkButton.setImage(checkCircle, forState: .Normal)
+                }
+            }
+            return cell
+        } else if(toDoSide && indexPath.row == toDo.count - 1) {
+            let cell = tableView.dequeueReusableCellWithIdentifier("bottomCell", forIndexPath: indexPath) as! BottomCell
+        
+            //up arrow
             cell.up.tag = indexPath.row
             cell.up.addTarget(self, action: "up:", forControlEvents: .TouchUpInside)
             cell.up.tintColor = purple
             cell.up.setImage(upImage, forState: .Normal)
-        }
-        
-        if(toDoSide && indexPath.row != toDo.count - 1) {
-            cell.down.tag = indexPath.row
-            cell.down.addTarget(self, action: "down:", forControlEvents: .TouchUpInside)
-            cell.down.setImage(downImage, forState: .Normal)
-            cell.down.tintColor = purple
-        } else if(indexPath.row != all.count - 1) {
-            cell.down.tag = indexPath.row
-            cell.down.addTarget(self, action: "down:", forControlEvents: .TouchUpInside)
-            cell.down.setImage(downImage, forState: .Normal)
-            cell.down.tintColor = purple
-        }
-        
-        if(toDoSide) {
-            cell.nameLabel.text = toDo[indexPath.row].valueForKey("name") as! String
-            cell.checkButton.tag = indexPath.row
-            cell.checkButton.addTarget(self, action: "complete:", forControlEvents: .TouchUpInside)
-            let image = UIImage(named: "purpCicle@1x.png") as UIImage?
-            cell.checkButton.setImage(image, forState: .Normal)
-        } else {
-            cell.nameLabel.text = all[indexPath.row].valueForKey("name") as! String
-            cell.checkButton.tag = indexPath.row
-            cell.checkButton.addTarget(self, action: "complete:", forControlEvents: .TouchUpInside)
-            var image = UIImage()
-            if(all[indexPath.row].valueForKey("completed") as! Bool) {
-                image = (UIImage(named: "checkCircle@1x.png") as UIImage?)!
+            
+            if(toDoSide) {
+                cell.nameLabel.text = toDo[indexPath.row].valueForKey("name") as! String
+                cell.checkButton.tag = indexPath.row
+                cell.checkButton.addTarget(self, action: "complete:", forControlEvents: .TouchUpInside)
+                cell.checkButton.setImage(openCircle, forState: .Normal)
             } else {
-                image = (UIImage(named: "purpCicle@1x.png") as UIImage?)!
+                cell.nameLabel.text = all[indexPath.row].valueForKey("name") as! String
+                cell.checkButton.tag = indexPath.row
+                cell.checkButton.addTarget(self, action: "complete:", forControlEvents: .TouchUpInside)
+                cell.checkButton.setImage(openCircle, forState: .Normal)
+                if(all[indexPath.row].valueForKey("completed") as! Bool) {
+                    cell.checkButton.setImage(checkCircle, forState: .Normal)
+                }
+                
             }
-            cell.checkButton.setImage(image, forState: .Normal)
-        }
+            
+            return cell
+        } else if(indexPath.row == all.count - 1)  {
+            let cell = tableView.dequeueReusableCellWithIdentifier("bottomCell", forIndexPath: indexPath) as! BottomCell
         
-        return cell
+                //up arrow
+                cell.up.tag = indexPath.row
+                cell.up.addTarget(self, action: "up:", forControlEvents: .TouchUpInside)
+                cell.up.tintColor = purple
+                cell.up.setImage(upImage, forState: .Normal)
+            
+            if(toDoSide) {
+                cell.nameLabel.text = toDo[indexPath.row].valueForKey("name") as! String
+                cell.checkButton.tag = indexPath.row
+                cell.checkButton.addTarget(self, action: "complete:", forControlEvents: .TouchUpInside)
+                cell.checkButton.setImage(openCircle, forState: .Normal)
+            } else {
+                cell.nameLabel.text = all[indexPath.row].valueForKey("name") as! String
+                cell.checkButton.tag = indexPath.row
+                cell.checkButton.addTarget(self, action: "complete:", forControlEvents: .TouchUpInside)
+                cell.checkButton.setImage(openCircle, forState: .Normal)
+                if(all[indexPath.row].valueForKey("completed") as! Bool) {
+                    cell.checkButton.setImage(checkCircle, forState: .Normal)
+                }
+            }
+            return cell
+        } else {
+            let cell = tableView.dequeueReusableCellWithIdentifier("stepCell", forIndexPath: indexPath) as! StepCell
+        
+            //up arrow
+            cell.up.tag = indexPath.row
+            cell.up.addTarget(self, action: "up:", forControlEvents: .TouchUpInside)
+            cell.up.tintColor = purple
+            cell.up.setImage(upImage, forState: .Normal)
+            
+            //down arrow
+            cell.down.tag = indexPath.row
+            cell.down.addTarget(self, action: "down:", forControlEvents: .TouchUpInside)
+            cell.down.setImage(downImage, forState: .Normal)
+            cell.down.tintColor = purple
+            
+            if(toDoSide) {
+                cell.nameLabel.text = toDo[indexPath.row].valueForKey("name") as! String
+                cell.checkButton.tag = indexPath.row
+                cell.checkButton.addTarget(self, action: "complete:", forControlEvents: .TouchUpInside)
+                cell.checkButton.setImage(openCircle, forState: .Normal)
+            } else {
+                cell.nameLabel.text = all[indexPath.row].valueForKey("name") as! String
+                cell.checkButton.tag = indexPath.row
+                cell.checkButton.addTarget(self, action: "complete:", forControlEvents: .TouchUpInside)
+                cell.checkButton.setImage(openCircle, forState: .Normal)
+                if(all[indexPath.row].valueForKey("completed") as! Bool) {
+                    cell.checkButton.setImage(checkCircle, forState: .Normal)
+                }
+                
+            }
+            return cell
+        }
     }
     
     func complete(sender: UIButton) {
@@ -311,55 +381,109 @@ class StepViewController: UIViewController, UITableViewDelegate, UITableViewData
     func changeOrder(elementIndex: Int, up: Bool) {
         let element = order[elementIndex]
         
+        print("!!!")
+        
         var first = [Int]()
         var second = [Int]()
         
-        if(up) {
-            
-            //if moving up
-            
-            if(elementIndex == 1) {
-                for(var l=elementIndex-1; l<order.count; l++) {
-                    if(l != elementIndex) {
-                        second.append(order[l])
+        if(!toDoSide) {
+            if(up) {
+                
+                print("UP")
+                
+                //if moving up
+                
+                if(elementIndex == 1) {
+                    second.append(order[0])
+                    for(var i=2; i<order.count; i++) {
+                        second.append(order[i])
                     }
+                } else {
+                
+                    for(var i=0; i<=elementIndex - 2; i++) {
+                        first.append(order[i])
+                    }
+                    for(var l=elementIndex-1; l<order.count; l++) {
+                        if(l != elementIndex) {
+                            second.append(order[l])
+                        }
+                    }
+                    
                 }
             } else {
-            
-                for(var i=0; i<=elementIndex - 2; i++) {
-                    first.append(order[i])
-                }
-                for(var l=elementIndex-1; l<order.count; l++) {
-                    if(l != elementIndex) {
+                
+                //if moving down
+                
+                print("DOWN")
+                
+                if(elementIndex == order.count - 2) {
+                    for(var i=0; i<elementIndex - 1; i++) {
+                        first.append(order[i])
+                    }
+                    first.append(order[order.count-1])
+                } else {
+                
+                    
+                    for(var i=0; i<=elementIndex + 1; i++) {
+                        if(i != elementIndex) {
+                            first.append(order[i])
+                        }
+                    }
+                    for(var l=elementIndex + 2; l<order.count; l++) {
                         second.append(order[l])
                     }
                 }
-                
             }
         } else {
-            
-            //if moving down
-            
-            if(elementIndex == order.count - 2) {
-                for(var i=0; i<order.count; i++) {
-                    if(i != elementIndex) {
+            if(up) {
+                
+                print("UP")
+                
+                //if moving up
+                
+                if(elementIndex == 1) {
+                    second.append(order[0])
+                    for(var i=2; i<order.count; i++) {
+                        second.append(order[i])
+                    }
+                } else {
+                    
+                    for(var i=0; i<=elementIndex - 2; i++) {
                         first.append(order[i])
                     }
+                    for(var l=elementIndex-1; l<order.count; l++) {
+                        if(l != elementIndex) {
+                            second.append(order[l])
+                        }
+                    }
+                    
                 }
             } else {
-            
                 
-                for(var i=0; i<=elementIndex + 1; i++) {
-                    if(i != elementIndex) {
+                //if moving down
+                
+                print("DOWN")
+                
+                if(elementIndex == order.count - 2) {
+                    for(var i=0; i<elementIndex; i++) {
                         first.append(order[i])
                     }
-                }
-                for(var l=elementIndex + 2; l<order.count; l++) {
-                    second.append(order[l])
+                    first.append(order[order.count-1])
+                } else {
+                    
+                    
+                    for(var i=0; i<=elementIndex + 1; i++) {
+                        if(i != elementIndex) {
+                            first.append(order[i])
+                        }
+                    }
+                    for(var l=elementIndex + 2; l<order.count; l++) {
+                        second.append(order[l])
+                    }
                 }
             }
         }
-        
+    
         //reconstruct order
         var temp = [Int]()
         for(var q=0; q<first.count; q++) {
@@ -372,6 +496,8 @@ class StepViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         order = [Int]()
         order = temp
+        
+        print(order)
         
         sortSubIdeas()
         table.reloadData()

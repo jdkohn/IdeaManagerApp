@@ -14,22 +14,12 @@ import CoreData
 class AddIdeaViewController: FormViewController {
 
     var ideas = [NSManagedObject]()
-    
+    var categories = [NSManagedObject]()
     
     override func viewDidLoad() {
         
-        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-        let managedContext = appDelegate.managedObjectContext
-        
-        let fetchRequest = NSFetchRequest(entityName:"Idea")
-        let error: NSError?
-        var fetchedResults = [NSManagedObject]()
-        do {
-            fetchedResults = try managedContext.executeFetchRequest(fetchRequest) as! [NSManagedObject]
-        } catch let error as NSError {
-            print("Fetch failed: \(error.localizedDescription)")
-        }
-        ideas = fetchedResults
+        ideas = populateCoreDataArray("Idea")
+        categories = populateCoreDataArray("Category")
         
         let form = FormDescriptor()
         
@@ -47,13 +37,59 @@ class AddIdeaViewController: FormViewController {
 
         section2.addRow(row)
         
-        form.sections = [section1, section2]
+        if(categories.count != 0) {
+            let section3 = FormSectionDescriptor()
+            
+            var opts = [Int]()
+            var sections = [String]()
+            
+            for(var i=0; i<categories.count; i++) {
+                opts.append(i)
+                sections.append(categories[i].valueForKey("name") as! String)
+            }
+                
+            row = FormRowDescriptor(tag: "category", rowType: .MultipleSelector, title: "Categories")
+            row.configuration[FormRowDescriptor.Configuration.Options] = opts
+            row.configuration[FormRowDescriptor.Configuration.AllowsMultipleSelection] = true
+            row.configuration[FormRowDescriptor.Configuration.TitleFormatterClosure] = { value in
+                for(var i=0; i<self.categories.count; i++) {
+                    if(i==value) {
+                        return sections[i]
+                    }
+                }
+                return nil
+                } as TitleFormatterClosure
+            
+            section3.addRow(row)
+        
+        
+            form.sections = [section1, section2, section3]
+            
+        } else {
+            form.sections = [section1, section2]
+        }
         
         self.form = form
         
         configureActions()
     }
     
+    func populateCoreDataArray(entity: String) -> [NSManagedObject] {
+        //get ideas
+        let appDelegate =
+        UIApplication.sharedApplication().delegate as! AppDelegate
+        let managedContext = appDelegate.managedObjectContext
+        let fetchRequest = NSFetchRequest(entityName:entity)
+        let error: NSError?
+        var fetchedResults = [NSManagedObject]()
+        do {
+            fetchedResults = try managedContext.executeFetchRequest(fetchRequest) as! [NSManagedObject]
+        } catch let error as NSError {
+            
+            print("Fetch failed: \(error.localizedDescription)")
+        }
+        return fetchedResults
+    }
     
     func configureActions() {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Submit", style: .Plain, target: self, action: "submit:")
@@ -74,13 +110,16 @@ class AddIdeaViewController: FormViewController {
         
         
         
-        //creates new password object
+        //creates new idea object
         let ideaObject = NSManagedObject(entity: entity!,
             insertIntoManagedObjectContext:managedContext)
         
         ideaObject.setValue(self.form.formValues().valueForKey("name") as! String, forKey: "name")
         
         ideaObject.setValue(self.form.formValues().valueForKey("summary") as! String, forKey: "summary")
+        
+        ideaObject.setValue((self.categories[self.form.formValues().valueForKey("category")![0] as! Int].valueForKey("name") as! String), forKey: "category")
+        print(self.categories[self.form.formValues().valueForKey("category")![0] as! Int].valueForKey("name") as! String)
         ideaObject.setValue(false, forKey: "completed")
         ideaObject.setValue(self.ideas.count, forKey: "id")
         ideaObject.setValue("", forKey: "order")
