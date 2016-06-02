@@ -93,9 +93,18 @@ class AddSubIdeaViewController: FormViewController {
         let ideaObject = NSManagedObject(entity: entity!,
             insertIntoManagedObjectContext:managedContext)
         
-        ideaObject.setValue(self.form.formValues().valueForKey("name") as! String, forKey: "name")
+        if let name = self.form.formValues().valueForKey("name") as? String {
+            ideaObject.setValue(name, forKey: "name")
+        } else {
+            ideaObject.setValue("", forKey: "name")
+        }
         
-        ideaObject.setValue(self.form.formValues().valueForKey("summary") as! String, forKey: "summary")
+        if let summary = self.form.formValues().valueForKey("summary") as? String {
+            ideaObject.setValue(summary, forKey: "summary")
+        } else {
+            ideaObject.setValue("", forKey: "summary")
+        }
+        
         ideaObject.setValue(false, forKey: "completed")
         ideaObject.setValue(idea, forKey: "idea")
         ideaObject.setValue(self.subideas.count, forKey: "id")

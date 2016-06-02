@@ -114,12 +114,20 @@ class AddIdeaViewController: FormViewController {
         let ideaObject = NSManagedObject(entity: entity!,
             insertIntoManagedObjectContext:managedContext)
         
-        ideaObject.setValue(self.form.formValues().valueForKey("name") as! String, forKey: "name")
+        if let name = self.form.formValues().valueForKey("name") as? String {
+            ideaObject.setValue(name, forKey: "name")
+        } else {
+            ideaObject.setValue("", forKey: "name")
+        }
         
-        ideaObject.setValue(self.form.formValues().valueForKey("summary") as! String, forKey: "summary")
+        if let summary = self.form.formValues().valueForKey("summary") as? String {
+            ideaObject.setValue(summary, forKey: "summary")
+        } else {
+            ideaObject.setValue("", forKey: "summary")
+        }
         
-        ideaObject.setValue((self.categories[self.form.formValues().valueForKey("category")![0] as! Int].valueForKey("name") as! String), forKey: "category")
-        print(self.categories[self.form.formValues().valueForKey("category")![0] as! Int].valueForKey("name") as! String)
+        ideaObject.setValue((self.categories[self.form.formValues().valueForKey("category")!.objectAtIndex(0) as! Int].valueForKey("name") as! String), forKey: "category")
+        print(self.categories[self.form.formValues().valueForKey("category")!.objectAtIndex(0) as! Int].valueForKey("name") as! String)
         ideaObject.setValue(false, forKey: "completed")
         ideaObject.setValue(self.ideas.count, forKey: "id")
         ideaObject.setValue("", forKey: "order")
